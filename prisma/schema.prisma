@@ -14,62 +14,90 @@ datasource db {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  email     String     @unique
-  name      String?
-  orders    Orders[]
-  medicines Medicine[]
-  reviews   Reviews[]
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+  role  Role    @default(CUSTOMER)
+
+  medicines Medicine[] 
+  orders    Order[] 
+  reviews   Review[]
+
+  createdAt DateTime @default(now())
 }
 
 model Medicine {
-  id            String    @id @default(uuid())
-  name          String    @db.VarChar(20)
-  sellerId      Int
-  seller        User      @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  description   String    @db.Text
-  price         Int
-  discountPrice Int       @default(0)
-  stock         Int
-  manufacturer  String
-  image         String
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  reviews       Reviews[]
-}
+  id          String @id @default(uuid())
+  name        String @db.VarChar(100)
+  description String @db.Text
 
-model Categories {
-  id        String   @id @default(uuid())
-  name      String
-  slug      String   @unique
+  price         Float
+  discountPrice Float @default(0)
+  stock         Int
+
+  manufacturer String
+  image        String
+  isActive     Boolean @default(true)
+
+  sellerId Int
+  seller   User @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  reviews Review[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Orders {
-  id            String        @id @default(uuid())
-  customerId    Int
-  customer      User          @relation(fields: [customerId], references: [id])
-  items         Json
-  totalAmount   Float
-  status        OrderStatus   @default(PLACED)
-  paymentMethod PaymentMethod @default(COD)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+model Category {
+  id   String @id @default(uuid())
+  name String
+  slug String @unique
+
+  medicines Medicine[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Reviews {
-  id         String   @id @default(uuid())
+model Order {
+  id         String @id @default(uuid())
+  customerId Int
+  customer   User   @relation(fields: [customerId], references: [id])
+
+  items           Json
+  totalAmount     Float
+  status          OrderStatus   @default(PLACED)
+  paymentMethod   PaymentMethod @default(COD)
+  shippingAddress String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id String @id @default(uuid())
+
   medicineId String
   medicine   Medicine @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+
   customerId Int
-  customer   User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  comment    String
-  rating     Int
-  createdAt  DateTime @default(now())
+  customer   User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  rating  Int
+  comment String?
+
+  createdAt DateTime @default(now())
 
   @@unique([medicineId, customerId])
+}
+
+enum Role {
+  CUSTOMER
+  SELLER
+  ADMIN
 }
 
 enum OrderStatus {
