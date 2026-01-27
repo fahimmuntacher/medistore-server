@@ -9,5 +9,6 @@ router.post(
   authMiddleWare(Role.CUSTOMER),
   categoryController.createCategory,
 );
+router.get("/", categoryController.getCategory);
 
 export const CategoryRouter = router;
