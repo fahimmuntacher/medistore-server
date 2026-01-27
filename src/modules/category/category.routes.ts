@@ -10,5 +10,6 @@ router.post(
   categoryController.createCategory,
 );
 router.get("/", categoryController.getCategory);
+router.put("/:id", categoryController.editCategory);
 
 export const CategoryRouter = router;

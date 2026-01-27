@@ -22,7 +22,18 @@ const getCategory = async (search?: string) => {
   });
 };
 
+const editCategory = async (data: any, categoryId: string) => {
+  const result = await prisma.category.update({
+    where: {
+      id: categoryId,
+    },
+    data: data,
+  });
+  return result;
+};
+
 export const categoryService = {
   createCategory,
   getCategory,
+  editCategory,
 };
