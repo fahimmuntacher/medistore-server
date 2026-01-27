@@ -14,16 +14,23 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
+  id    String  @id @default(uuid())
   email String  @unique
   name  String?
   role  Role    @default(CUSTOMER)
 
-  medicines Medicine[] 
-  orders    Order[] 
+  medicines Medicine[]
+  orders    Order[]
   reviews   Review[]
 
-  createdAt DateTime @default(now())
+  createdAt     DateTime  @default(now())
+  emailVerified Boolean   @default(false)
+  image         String?
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("user")
 }
 
 model Medicine {
@@ -39,8 +46,8 @@ model Medicine {
   image        String
   isActive     Boolean @default(true)
 
-  sellerId Int
-  seller   User @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId String
+  seller   User   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
@@ -64,7 +71,7 @@ model Category {
 
 model Order {
   id         String @id @default(uuid())
-  customerId Int
+  customerId String
   customer   User   @relation(fields: [customerId], references: [id])
 
   items           Json
@@ -83,8 +90,8 @@ model Review {
   medicineId String
   medicine   Medicine @relation(fields: [medicineId], references: [id], onDelete: Cascade)
 
-  customerId Int
-  customer   User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   rating  Int
   comment String?
@@ -110,4 +117,52 @@ enum OrderStatus {
 
 enum PaymentMethod {
   COD
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }
