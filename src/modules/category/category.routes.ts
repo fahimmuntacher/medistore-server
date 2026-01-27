@@ -11,5 +11,6 @@ router.post(
 );
 router.get("/", categoryController.getCategory);
 router.put("/:id", categoryController.editCategory);
+router.delete("/:id", categoryController.deleteCategory);
 
 export const CategoryRouter = router;

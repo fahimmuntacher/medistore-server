@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { categoryService } from "./category.service";
-import { auth as betterAuth } from "../../lib/auth";
 
+// create category
 const createCategory = async (req: Request, res: Response) => {
   try {
     const result = await categoryService.createCategory(req.body);
@@ -28,6 +28,7 @@ const getCategory = async (req: Request, res: Response) => {
   }
 };
 
+// delete category
 const editCategory = async (req: Request, res: Response) => {
   try {
     const editedData = req.body;
@@ -42,8 +43,25 @@ const editCategory = async (req: Request, res: Response) => {
   }
 };
 
+// delete category
+const deleteCategory = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await categoryService.deleteCategory(id as string);
+    res.status(200).json({
+      result,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      error: "Category delte failed",
+      details: error.message,
+    });
+  }
+};
+
 export const categoryController = {
   createCategory,
   getCategory,
   editCategory,
+  deleteCategory,
 };
