@@ -8,8 +8,8 @@ app.use(express.json());
 
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 
-app.use("/api/v1/medicine", MedicineRouter);
-app.use("/api/v1/category", CategoryRouter);
+app.use("/api/v1/medicines", MedicineRouter);
+app.use("/api/v1/categories", CategoryRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello from medistore");
