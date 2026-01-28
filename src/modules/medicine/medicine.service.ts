@@ -14,17 +14,6 @@ const createMedicine = async (
 
 // get all medicine
 
-type MedicineFilter = {
-  search?: string | undefined;
-  category?: string | undefined;
-  manufacturer?: string | undefined;
-  minPrice?: number | undefined;
-  maxPrice?: number | undefined;
-  page: number;
-  limit: number;
-  sortBy: string;
-  sortOrder: "asc" | "desc";
-};
 const getAllMedicine = async ({
   search,
   category,
@@ -92,7 +81,7 @@ const getAllMedicine = async ({
   if (category) {
     andConditions.push({
       category: {
-        slug: category
+        slug: category,
       },
     });
   }
@@ -153,7 +142,31 @@ const getAllMedicine = async ({
   };
 };
 
+// get single medicine
+const getSingleMedine = async (id: string) => {
+  const result = await prisma.medicine.findUnique({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
+// edit medicine
+
+const editMedicine = async (data: any, id: string) => {
+  const result = await prisma.medicine.update({
+    where: {
+      id : id
+    },
+    data,
+  });
+  return result;
+};
+
 export const medicineService = {
   createMedicine,
   getAllMedicine,
+  getSingleMedine,
+  editMedicine,
 };

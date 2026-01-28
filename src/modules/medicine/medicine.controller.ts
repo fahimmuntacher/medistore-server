@@ -64,7 +64,36 @@ const getMedicine = async (req: Request, res: Response) => {
   }
 };
 
+const getSingleMedine = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await medicineService.getSingleMedine(id as string);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({
+      error: "Medicine retrive failed",
+      details: error.message,
+    });
+  }
+};
+
+const editMedicine = async (req: Request, res: Response) => {
+  try {
+    const editedData = req.body;
+    const { id } = req.params;
+    const result = await medicineService.editMedicine(editedData, id as string);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({
+      error: "Medicine edit failed",
+      details: error.message,
+    });
+  }
+};
+
 export const medicineController = {
   createMedicine,
   getMedicine,
+  getSingleMedine,
+  editMedicine
 };
