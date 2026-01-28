@@ -54,8 +54,9 @@ model Medicine {
 
   reviews Review[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  orderItems OrderItem[]
 }
 
 model Category {
@@ -74,7 +75,7 @@ model Order {
   customerId String
   customer   User   @relation(fields: [customerId], references: [id])
 
-  items           Json
+  items           OrderItem[]
   totalAmount     Float
   status          OrderStatus   @default(PLACED)
   paymentMethod   PaymentMethod @default(COD)
@@ -82,6 +83,20 @@ model Order {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id      String @id @default(uuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  medicineId String
+  medicine   Medicine @relation(fields: [medicineId], references: [id])
+
+  quantity Int
+  price    Float 
+
+  createdAt DateTime @default(now())
 }
 
 model Review {

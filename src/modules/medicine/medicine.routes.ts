@@ -12,6 +12,11 @@ router.post(
 router.get("/", medicineController.getMedicine);
 
 router.get("/:id", medicineController.getSingleMedine);
-router.put("/:id", medicineController.editMedicine);
+
+router.put(
+  "/:id",
+  authMiddleWare(Role.SELLER),
+  medicineController.editMedicine,
+);
 
 export const MedicineRouter = router;

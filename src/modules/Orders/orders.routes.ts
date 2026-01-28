@@ -1,10 +1,8 @@
-import { Request, Response, Router } from "express";
+import {  Router } from "express";
+import { orderController } from "./orders.controller";
 
-const router = Router()
+const router = Router();
 
-
-router.get("/", async(req : Request, res : Response) => {
-    res.send("hello from order api")
-})
+router.post("/", orderController.createOrder);
 
 export const OrderRouter = router;
