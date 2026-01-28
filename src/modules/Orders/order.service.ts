@@ -1,3 +1,4 @@
+import { Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 type OrderInput = {
@@ -68,6 +69,84 @@ const createOrder = async (data: OrderInput) => {
   return order;
 };
 
+interface IGetAllOrdersParams {
+  page?: number | undefined;
+  limit?: number | undefined;
+  skip?: number | undefined;
+  sortBy?: string | undefined;
+  sortOrder?: "asc" | "desc";
+  search?: string | undefined;
+}
+
+const getAllOrders = async ({
+  page,
+  skip = 0,
+  limit = 10,
+  sortBy = "createdAt",
+  sortOrder = "desc",
+  search,
+}: IGetAllOrdersParams) => {
+  const andConditions: Prisma.OrderWhereInput[] = [];
+  if (search) {
+    andConditions.push({
+      OR: [
+        {
+          id: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ],
+    });
+  }
+  const orders = await prisma.order.findMany({
+    take: limit,
+    skip,
+    where: {
+      AND: andConditions,
+    },
+    include: {
+      customer: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      items: {
+        include: {
+          medicine: {
+            select: {
+              name: true,
+              manufacturer: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+  });
+
+  const total = await prisma.order.count({
+    where: {
+      AND: andConditions,
+    },
+  });
+
+  return {
+    orders,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
 export const orderService = {
   createOrder,
+  getAllOrders,
 };
