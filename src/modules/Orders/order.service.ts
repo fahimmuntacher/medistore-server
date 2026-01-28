@@ -2,7 +2,6 @@ import { OrderStatus, Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 type OrderInput = {
-  customerId: string;
   shippingAddress: string;
   paymentMethod?: "COD";
   items: {
@@ -11,35 +10,29 @@ type OrderInput = {
   }[];
 };
 
-const createOrder = async (data: OrderInput) => {
-  // Step 1: Prepare order items and validate stock
+const createOrder = async (data: OrderInput, customerId: string) => {
+  let totalAmount = 0;
   const orderItems = [];
   const medicineUpdates = [];
-  let totalAmount = 0;
 
   for (const item of data.items) {
     const medicine = await prisma.medicine.findUnique({
       where: { id: item.medicineId },
     });
 
-    if (!medicine) {
+    if (!medicine)
       throw new Error(`Medicine with ID ${item.medicineId} not found`);
-    }
-
-    if (medicine.stock < item.quantity) {
+    if (medicine.stock < item.quantity)
       throw new Error(`${medicine.name} out of stock`);
-    }
 
     totalAmount += medicine.price * item.quantity;
 
-    // Prepare order item
     orderItems.push({
       medicineId: medicine.id,
       quantity: item.quantity,
       price: medicine.price,
     });
 
-    // Prepare stock update
     medicineUpdates.push(
       prisma.medicine.update({
         where: { id: medicine.id },
@@ -48,25 +41,20 @@ const createOrder = async (data: OrderInput) => {
     );
   }
 
-  // Step 2: Run all updates + order creation in a single transaction
   const results = await prisma.$transaction([
     ...medicineUpdates,
     prisma.order.create({
       data: {
-        customerId: data.customerId,
+        customerId,
         shippingAddress: data.shippingAddress,
         totalAmount,
         paymentMethod: data.paymentMethod ?? "COD",
-        items: {
-          create: orderItems,
-        },
+        items: { create: orderItems },
       },
     }),
   ]);
 
-  const order = results[results.length - 1];
-
-  return order;
+  return results[results.length - 1]; 
 };
 
 interface IGetAllOrdersParams {
@@ -173,16 +161,21 @@ const getSingleOrder = async (id: string) => {
 };
 
 const editSingleOrder = async (id: string, status: string) => {
-
-  const validStatuses = ["PLACED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+  const validStatuses = [
+    "PLACED",
+    "PROCESSING",
+    "SHIPPED",
+    "DELIVERED",
+    "CANCELLED",
+  ];
   if (!validStatuses.includes(status)) {
     throw new Error(`Invalid status: ${status}`);
   }
 
   return prisma.order.update({
-    where: { id },     
+    where: { id },
     data: {
-      status: status as OrderStatus, 
+      status: status as OrderStatus,
     },
   });
 };

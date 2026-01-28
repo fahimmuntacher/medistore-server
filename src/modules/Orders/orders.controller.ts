@@ -4,7 +4,9 @@ import { paginationsSortingHelper } from "../../helpers/paginationsSortingHelper
 
 const createOrder = async (req: Request, res: Response) => {
   try {
-    const result = await orderService.createOrder(req.body);
+    const { customerId } = req.user?.id as any;
+    console.log("customer id order make:", req.user?.id);
+    const result = await orderService.createOrder(req.body, req.user?.id as string);
     res.status(201).json({
       success: true,
       message: "Order placed successfully",
