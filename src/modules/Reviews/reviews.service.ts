@@ -1,3 +1,4 @@
+import { paginationsSortingHelper } from "../../helpers/paginationsSortingHelper";
 import { prisma } from "../../lib/prisma";
 
 const addReview = async ({
@@ -65,13 +66,58 @@ const addReview = async ({
   });
 };
 
+export type GetAllReviewOptions = {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  rating?: number | undefined; // optional filter by rating
+};
 
-const getAllReview = async() =>{
-    const result = await prisma.review.findMany();
-    return result
-}
+const getAllReview = async (options: GetAllReviewOptions = {}) => {
+  const {
+    page = 1,
+    limit = 10,
+    sortBy = "rating",
+    sortOrder = "desc",
+    rating,
+  } = options;
+
+  const skip = (page - 1) * limit;
+
+  // Grouped rating counts
+  const groupedRating = await prisma.review.groupBy({
+    by: ["rating"],
+    _count: { id: true },
+    orderBy: { rating: sortOrder },
+  });
+
+  // Find reviews (with optional rating filter)
+  const where: any = {};
+  if (rating !== undefined) where.rating = rating;
+
+  const reviews = await prisma.review.findMany({
+    take: limit,
+    skip,
+    orderBy: { [sortBy]: sortOrder },
+    where,
+  });
+
+  const total = await prisma.review.count({ where });
+
+  return {
+    data: reviews,
+    groupedRating,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
 
 export const reviewService = {
   addReview,
-  getAllReview
+  getAllReview,
 };

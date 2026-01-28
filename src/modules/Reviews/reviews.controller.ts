@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { reviewService } from "./reviews.service";
+import { GetAllReviewOptions, reviewService } from "./reviews.service";
 
 const addReview = async (req: Request, res: Response) => {
   try {
@@ -27,10 +27,28 @@ const addReview = async (req: Request, res: Response) => {
 
 const getAllReview = async (req: Request, res: Response) => {
   try {
-    const result = await reviewService.getAllReview();
+    // Cast query params properly
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const limit = req.query.limit ? Number(req.query.limit) : 10;
+    const sortBy = (req.query.sortBy as string) || "rating"; 
+    const sortOrder = (req.query.sortOrder as "asc" | "desc") || "desc"; 
+
+    const ratingFilter = req.query.rating ? Number(req.query.rating) : undefined;
+
+    const options: GetAllReviewOptions = {
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+      rating: ratingFilter,
+      
+    };
+
+    const result = await reviewService.getAllReview(options);
+
     res.status(200).json({
       success: true,
-      data: result,
+      ...result,
     });
   } catch (error: any) {
     res.status(400).json({
@@ -39,6 +57,7 @@ const getAllReview = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 export const reviewController = {
   addReview,
