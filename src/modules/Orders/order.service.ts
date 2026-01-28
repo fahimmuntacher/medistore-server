@@ -1,4 +1,4 @@
-import { Prisma } from "../../../generated/prisma/client";
+import { OrderStatus, Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 type OrderInput = {
@@ -146,7 +146,49 @@ const getAllOrders = async ({
   };
 };
 
+const getSingleOrder = async (id: string) => {
+  return prisma.order.findUnique({
+    where: { id },
+    include: {
+      customer: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      items: {
+        include: {
+          medicine: {
+            select: {
+              id: true,
+              name: true,
+              manufacturer: true,
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
+const editSingleOrder = async (id: string, status: string) => {
+
+  const validStatuses = ["PLACED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+  if (!validStatuses.includes(status)) {
+    throw new Error(`Invalid status: ${status}`);
+  }
+
+  return prisma.order.update({
+    where: { id },     
+    data: {
+      status: status as OrderStatus, 
+    },
+  });
+};
 export const orderService = {
   createOrder,
   getAllOrders,
+  getSingleOrder,
+  editSingleOrder,
 };
