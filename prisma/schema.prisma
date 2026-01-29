@@ -136,6 +136,31 @@ model SiteSetting {
   updatedAt DateTime @updatedAt
 }
 
+model Menu {
+  id        String     @id @default(uuid())
+  name      String
+  items     MenuItem[]
+  createdAt DateTime   @default(now())
+}
+
+model MenuItem {
+  id        String       @id @default(uuid())
+  label     String
+  url       String
+  order     Int
+  position  MenuPosition
+  menuId    String
+  allowedRoles Role[]
+  menu      Menu         @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+}
+
+enum MenuPosition {
+  HEADER
+  FOOTER
+  BOTH
+}
+
 enum Role {
   CUSTOMER
   SELLER
