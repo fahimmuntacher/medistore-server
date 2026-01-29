@@ -16,36 +16,34 @@ const createMenuItem = async (data: {
   position: MenuPosition;
   menuId: string;
 }) => {
-  return prisma.menuItem.create({
+  const isMatchUrl = await prisma.menuItem.findFirst({
+    where: { url: data.url },
+  });
+
+  if (isMatchUrl) {
+    throw new Error("Url must be unique");
+  }
+  return await prisma.menuItem.create({
     data,
   });
 };
 
-// get menus by position (HEADER / FOOTER)
-const getMenusByPosition = async (
-  position: MenuPosition,
-  role: Role,
-) => {
+// get menus by position
+const getMenusByPosition = async (position: MenuPosition, role?: Role) => {
   return prisma.menu.findMany({
     include: {
       items: {
-        where: {
-          AND: [
-            { OR: [{ position }, { position: "BOTH" }] },
-              ...(role
-            ? [{
-                allowedRoles: {
-                  has: role
-                }
-              }]
-            : [])
-          ],
-        },
-        orderBy: { order: "asc" },
-      },
+        select : {
+            id : true,
+            label : true,
+            url : true
+        }
+      }
     },
   });
 };
+
+
 
 // update menu item
 const updateMenuItem = async (
@@ -82,5 +80,5 @@ export const menuService = {
   getMenusByPosition,
   updateMenuItem,
   deleteMenuItem,
-  deleteMenu
+  deleteMenu,
 };

@@ -144,15 +144,15 @@ model Menu {
 }
 
 model MenuItem {
-  id        String       @id @default(uuid())
-  label     String
-  url       String
-  order     Int
-  position  MenuPosition
-  menuId    String
+  id           String       @id @default(uuid())
+  label        String
+  url          String      
+  order        Int
+  position     MenuPosition
+  menuId       String
   allowedRoles Role[]
-  menu      Menu         @relation(fields: [menuId], references: [id], onDelete: Cascade)
-  createdAt DateTime     @default(now())
+  menu         Menu         @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  createdAt    DateTime     @default(now())
 }
 
 enum MenuPosition {
