@@ -35,7 +35,7 @@ export const authMiddleWare = (...roles: Role[]) => {
         });
       }
 
-      if (session.user.emailVerified) {
+      if (!session.user.emailVerified) {
         return res.status(403).json({
           success: false,
           message: "Email verification required. Please verfiy your email!",
