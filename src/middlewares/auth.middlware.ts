@@ -26,7 +26,7 @@ export const authMiddleWare = (...roles: Role[]) => {
       const session = await auth.api.getSession({
         headers: req.headers as any,
       });
-      console.log(session);
+      // console.log(session);
 
       if (!session) {
         return res.status(401).json({

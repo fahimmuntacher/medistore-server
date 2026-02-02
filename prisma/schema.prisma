@@ -29,6 +29,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  cart          Cart?
 
   @@map("user")
 }
@@ -57,6 +58,7 @@ model Medicine {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   orderItems OrderItem[]
+  cartItems  CartItem[]
 }
 
 model Category {
@@ -80,7 +82,7 @@ model Order {
   totalAmount     Float
   status          OrderStatus   @default(PLACED)
   paymentMethod   PaymentMethod @default(COD)
-  shippingAddress String
+  shippingAddress Json
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -123,6 +125,32 @@ model Review {
   @@unique([medicineId, customerId, orderId])
 }
 
+model Cart {
+  id         String @id @default(uuid())
+  customerId String @unique
+  customer   User   @relation(fields: [customerId], references: [id])
+
+  items CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id String @id @default(uuid())
+
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  medicineId String
+  medicine   Medicine @relation(fields: [medicineId], references: [id])
+
+  quantity Int   @default(1)
+  price    Float // snapshot price
+
+  @@unique([cartId, medicineId])
+}
+
 // site setting model
 model SiteSetting {
   id        String   @id @default(uuid())
@@ -146,7 +174,7 @@ model Menu {
 model MenuItem {
   id           String       @id @default(uuid())
   label        String
-  url          String      
+  url          String
   order        Int
   position     MenuPosition
   menuId       String

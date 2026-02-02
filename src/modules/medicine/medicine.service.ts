@@ -5,7 +5,7 @@ import { prisma } from "../../lib/prisma";
 const createMedicine = async (
   data: Omit<Medicine, "id" | "createdAt |updatedAt ">,
 ) => {
-  const result = await prisma.medicine.create({
+  const result = await prisma.medicine.createMany({
     data,
   });
 

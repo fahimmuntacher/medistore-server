@@ -6,7 +6,7 @@ const router = Router();
 
 router.post(
   "/",
-  authMiddleWare(Role.CUSTOMER),
+  authMiddleWare(Role.ADMIN),
   categoryController.createCategory,
 );
 router.get("/", categoryController.getCategory);
