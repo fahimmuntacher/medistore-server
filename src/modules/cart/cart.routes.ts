@@ -15,15 +15,15 @@ router.patch(
 );
 
 router.delete(
-  "/:itemId",
-  authMiddleWare(Role.CUSTOMER),
-  cartControllers.removeItem,
-);
-
-router.delete(
   "/clear",
   authMiddleWare(Role.CUSTOMER),
   cartControllers.clearCart,
+);
+
+router.delete(
+  "/:itemId",
+  authMiddleWare(Role.CUSTOMER),
+  cartControllers.removeItem,
 );
 
 export const CartRoutes = router;

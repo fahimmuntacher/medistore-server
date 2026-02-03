@@ -4,12 +4,19 @@ import { CartServices } from "./cart.service";
 const getCart = async (req: Request, res: Response) => {
   const customerId = req.user?.id;
 
-  const cart = await CartServices.getCart(customerId as string);
+  try {
+    const cart = await CartServices.getCart(customerId as string);
 
-  res.status(200).json({
-    success: true,
-    data: cart,
-  });
+    res.status(200).json({
+      success: true,
+      data: cart,
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      data: error,
+    });
+  }
 };
 
 const addToCart = async (req: Request, res: Response) => {
@@ -57,28 +64,50 @@ const updateQuantity = async (req: Request, res: Response) => {
 };
 
 const removeItem = async (req: Request, res: Response) => {
-  const customerId = req.user?.id;
-  const { itemId } = req.params;
+  try {
+    const customerId = req.user?.id;
+    const { itemId } = req.params;
 
-  await CartServices.removeItem(customerId as string, itemId as string);
+    await CartServices.removeItem(customerId as string, itemId as string);
 
-  res.status(200).json({
-    success: true,
-    message: "Item removed",
-  });
+    res.status(200).json({
+      success: true,
+      message: "Item removed",
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: error,
+    });
+  }
 };
 
 const clearCart = async (req: Request, res: Response) => {
-  const customerId = req.user?.id;
+  try {
+    const customerId = req.user?.id;
+    // console.log("Attempting to clear cart for customerId:", customerId);
 
-  await CartService.clearCart(customerId as string);
+    if (!customerId) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not authenticated" });
+    }
 
-  res.status(200).json({
-    success: true,
-    message: "Cart cleared",
-  });
+    await CartServices.clearCart(customerId as string);
+
+    res.status(200).json({
+      success: true,
+      message: "Cart cleared",
+    });
+  } catch (error: any) {
+    // console.error("DETAILED CLEAR CART ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
 };
-
 export const cartControllers = {
   addToCart,
   getCart,
