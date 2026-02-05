@@ -9,6 +9,7 @@ import { reviewsRouter } from "./modules/Reviews/reviews.routes";
 import { settingsRoutes } from "./modules/settings/settings.routes";
 import { menuRotuer } from "./modules/menus/menu.routes";
 import { CartRoutes } from "./modules/cart/cart.routes";
+import { dashboardRouter } from "./modules/dashboard/dashboard.routes";
 const app: Application = express();
 app.use(
   cors({
@@ -36,6 +37,8 @@ app.use("/api/v1/reviews", reviewsRouter);
 app.use("/api/v1/site-settings", settingsRoutes);
 // menus router
 app.use("/api/v1/menus", menuRotuer);
+// dashboard router
+app.use("/api/v1/dashboard", dashboardRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello from medistore");

@@ -6,7 +6,7 @@ const router = Router();
 
 router.post(
   "/",
-  authMiddleWare(Role.ADMIN),
+  authMiddleWare(Role.SELLER),
   medicineController.createMedicine,
 );
 router.get("/", medicineController.getMedicine);

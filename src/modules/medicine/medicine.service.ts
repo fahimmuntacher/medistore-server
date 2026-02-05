@@ -5,7 +5,7 @@ import { prisma } from "../../lib/prisma";
 const createMedicine = async (
   data: Omit<Medicine, "id" | "createdAt |updatedAt ">,
 ) => {
-  const result = await prisma.medicine.createMany({
+  const result = await prisma.medicine.create({
     data,
   });
 
@@ -148,6 +148,21 @@ const getSingleMedine = async (id: string) => {
     where: {
       id,
     },
+    include: {
+      category : {
+        select : {
+          name : true,
+          slug : true
+        }
+      },
+      seller: {
+        select: {
+          email: true,
+          name: true,
+          image: true,
+        },
+      },
+    },
   });
   return result;
 };
@@ -157,7 +172,7 @@ const getSingleMedine = async (id: string) => {
 const editMedicine = async (data: any, id: string) => {
   const result = await prisma.medicine.update({
     where: {
-      id : id
+      id: id,
     },
     data,
   });
