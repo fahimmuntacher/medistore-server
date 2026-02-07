@@ -3,10 +3,21 @@ import { medicineService } from "./medicine.service";
 import { paginationsSortingHelper } from "../../helpers/paginationsSortingHelper";
 import { Role } from "../../middlewares/auth.middlware";
 
-// create medicine
 const createMedicine = async (req: Request, res: Response) => {
   try {
-    const result = await medicineService.createMedicine(req.body);
+    const user = req.user;
+
+    if (!user || user.role !== Role.SELLER) {
+      return res.status(403).json({
+        error: "Only sellers can create medicine",
+      });
+    }
+
+    const result = await medicineService.createMedicine({
+      ...req.body,
+      sellerId: user.id, 
+    });
+
     res.status(201).json(result);
   } catch (error: any) {
     res.status(400).json({
@@ -15,6 +26,7 @@ const createMedicine = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 // get all medicine controller
 const getMedicine = async (req: Request, res: Response) => {
