@@ -54,7 +54,7 @@ const createOrder = async (data: OrderInput, customerId: string) => {
     }),
   ]);
 
-  return results[results.length - 1]; 
+  return results[results.length - 1];
 };
 
 interface IGetAllOrdersParams {
@@ -64,6 +64,8 @@ interface IGetAllOrdersParams {
   sortBy?: string | undefined;
   sortOrder?: "asc" | "desc";
   search?: string | undefined;
+  customerId?: string | undefined;
+  sellerId?: string | undefined
 }
 
 const getAllOrders = async ({
@@ -73,20 +75,41 @@ const getAllOrders = async ({
   sortBy = "createdAt",
   sortOrder = "desc",
   search,
+  customerId,
+  sellerId,
 }: IGetAllOrdersParams) => {
   const andConditions: Prisma.OrderWhereInput[] = [];
+
+  /* Search by order id */
   if (search) {
     andConditions.push({
-      OR: [
-        {
-          id: {
-            contains: search,
-            mode: "insensitive",
-          },
-        },
-      ],
+      id: {
+        contains: search,
+        mode: "insensitive",
+      },
     });
   }
+
+  /*  Customer → only own orders */
+  if (customerId) {
+    andConditions.push({
+      customerId,
+    });
+  }
+
+  /* Seller → orders that contain seller's medicines */
+  if (sellerId) {
+    andConditions.push({
+      items: {
+        some: {
+          medicine: {
+            sellerId,
+          },
+        },
+      },
+    });
+  }
+
   const orders = await prisma.order.findMany({
     take: limit,
     skip,
@@ -105,8 +128,10 @@ const getAllOrders = async ({
         include: {
           medicine: {
             select: {
+              id: true,
               name: true,
               manufacturer: true,
+              sellerId: true,
             },
           },
         },

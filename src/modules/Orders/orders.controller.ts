@@ -4,7 +4,7 @@ import { paginationsSortingHelper } from "../../helpers/paginationsSortingHelper
 
 const createOrder = async (req: Request, res: Response) => {
   try {
-    const { customerId } = req.user?.id as any;
+    // const { customerId } = req.user?.id as any;
     console.log("customer id order make:", req.user?.id);
     const result = await orderService.createOrder(req.body, req.user?.id as string);
     res.status(201).json({
@@ -21,13 +21,17 @@ const createOrder = async (req: Request, res: Response) => {
   }
 };
 
+
+
 const getAllOrders = async (req: Request, res: Response) => {
   try {
     const search =
       typeof req.query.search === "string" ? req.query.search : undefined;
-    const { page, limit, skip, sortBy, sortOrder } = paginationsSortingHelper(
-      req.query,
-    );
+
+    const { page, limit, skip, sortBy, sortOrder } =
+      paginationsSortingHelper(req.query);
+
+    const user = req.user; 
 
     const result = await orderService.getAllOrders({
       page,
@@ -36,18 +40,27 @@ const getAllOrders = async (req: Request, res: Response) => {
       sortBy,
       sortOrder,
       search,
+
+      customerId: user?.role === "CUSTOMER" ? user.id : undefined,
+      sellerId: user?.role === "SELLER" ? user.id : undefined,
+
     });
+
     res.status(200).json({
       success: true,
       data: result,
     });
   } catch (error: any) {
     res.status(400).json({
-      error: "Orders retrieve failed",
-      details: error.message,
+      success: false,
+      message: "Orders retrieve failed",
+      error: error.message,
     });
   }
 };
+
+
+
 
 const getSingleOrder = async (req: Request, res: Response) => {
   const { id } = req.params;

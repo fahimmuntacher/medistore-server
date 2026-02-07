@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { medicineService } from "./medicine.service";
 import { paginationsSortingHelper } from "../../helpers/paginationsSortingHelper";
+import { Role } from "../../middlewares/auth.middlware";
 
 // create medicine
 const createMedicine = async (req: Request, res: Response) => {
@@ -15,8 +16,11 @@ const createMedicine = async (req: Request, res: Response) => {
   }
 };
 
+// get all medicine controller
 const getMedicine = async (req: Request, res: Response) => {
   try {
+    const user = req.user;
+    // console.log("seller id", user);
     const search =
       typeof req.query.search === "string" ? req.query.search : undefined;
 
@@ -53,6 +57,7 @@ const getMedicine = async (req: Request, res: Response) => {
       skip,
       sortBy,
       sortOrder,
+      sellerId: user?.role === Role.SELLER ? user.id : undefined,
     });
 
     res.status(200).json(result);
@@ -91,9 +96,28 @@ const editMedicine = async (req: Request, res: Response) => {
   }
 };
 
+const deleMedicine = async (req: Request, res: Response) => {
+  try {
+    const sellerId = req.user?.id;
+    console.log("seller ID for delte", sellerId);
+    const { id } = req.params;
+    const result = await medicineService.deleteMedicine(
+      id as string,
+      sellerId as string,
+    );
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({
+      error: "Medicine retrive failed",
+      details: error.message,
+    });
+  }
+};
+
 export const medicineController = {
   createMedicine,
   getMedicine,
   getSingleMedine,
-  editMedicine
+  editMedicine,
+  deleMedicine,
 };

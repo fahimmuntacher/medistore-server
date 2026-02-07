@@ -10,6 +10,7 @@ router.post(
   medicineController.createMedicine,
 );
 router.get("/", medicineController.getMedicine);
+router.get("/seller", authMiddleWare(Role.SELLER), medicineController.getMedicine);
 
 router.get("/:id", medicineController.getSingleMedine);
 
@@ -18,5 +19,7 @@ router.put(
   authMiddleWare(Role.SELLER),
   medicineController.editMedicine,
 );
+
+router.delete("/:id", authMiddleWare(Role.SELLER), medicineController.deleMedicine);
 
 export const MedicineRouter = router;

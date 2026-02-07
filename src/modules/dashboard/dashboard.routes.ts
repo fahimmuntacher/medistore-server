@@ -16,7 +16,7 @@ router.get(
 );
 router.get(
   "/customer",
-  authMiddleWare(Role.CUSTOMER),
+  
   dashboardController.customerOverview,
 );
 
