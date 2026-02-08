@@ -51,7 +51,7 @@ model Medicine {
   seller   User   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
   categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   reviews Review[]
 
@@ -96,7 +96,7 @@ model OrderItem {
   order   Order  @relation(fields: [orderId], references: [id])
 
   medicineId String
-  medicine   Medicine @relation(fields: [medicineId], references: [id])
+  medicine   Medicine @relation(fields: [medicineId], references: [id], onDelete: Cascade)
 
   quantity Int
   price    Float
@@ -128,7 +128,7 @@ model Review {
 model Cart {
   id         String @id @default(uuid())
   customerId String @unique
-  customer   User   @relation(fields: [customerId], references: [id])
+  customer   User   @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   items CartItem[]
 
@@ -143,7 +143,7 @@ model CartItem {
   cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
   medicineId String
-  medicine   Medicine @relation(fields: [medicineId], references: [id])
+  medicine   Medicine @relation(fields: [medicineId], references: [id], onDelete: Cascade)
 
   quantity Int   @default(1)
   price    Float // snapshot price

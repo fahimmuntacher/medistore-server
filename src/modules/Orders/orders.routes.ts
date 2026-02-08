@@ -5,14 +5,15 @@ import { authMiddleWare, Role } from "../../middlewares/auth.middlware";
 const router = Router();
 
 router.post("/", authMiddleWare(Role.CUSTOMER), orderController.createOrder);
+
 router.get(
   "/",
   authMiddleWare(Role.ADMIN, Role.CUSTOMER, Role.SELLER),
   orderController.getAllOrders,
 );
+
 router.get(
   "/:id",
-  
   orderController.getSingleOrder,
 );
 router.put(

@@ -1,6 +1,12 @@
 import { Category } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
+interface GetCategoryParams {
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
 // create category
 const createCategory = async (data: Category) => {
   const result = await prisma.category.create({
@@ -11,17 +17,37 @@ const createCategory = async (data: Category) => {
 };
 
 // get all category
-const getCategory = async (search?: string) => {
-  return await prisma.category.findMany({
-    where: search
-      ? {
-          OR: [
-            { name: { contains: search, mode: "insensitive" } },
-            { slug: { contains: search, mode: "insensitive" } },
-          ],
-        }
-      : {},
+
+
+const getCategory = async ({
+  search,
+  page = 1,
+  limit = 10,
+}: GetCategoryParams) => {
+  const skip = (page - 1) * limit;
+
+  const where: any = search
+    ? { name: { contains: search, mode: "insensitive" } }
+    : {};
+
+  const total = await prisma.category.count({ where });
+
+  const categories = await prisma.category.findMany({
+    where,
+    skip,
+    take: limit,
+    orderBy: { createdAt: "desc" },
   });
+
+  return {
+    categories,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 // edit category

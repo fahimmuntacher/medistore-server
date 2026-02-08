@@ -17,17 +17,22 @@ const createCategory = async (req: Request, res: Response) => {
 // get all category
 const getCategory = async (req: Request, res: Response) => {
   try {
-    const { search } = req.query;
-    const reuslt = await categoryService.getCategory(search as string);
-    res.status(200).json(reuslt);
+    const { search, page, limit } = req.query;
+
+    const result = await categoryService.getCategory({
+      search: search as string,
+      page: page ? parseInt(page as string) : 1,
+      limit: limit ? parseInt(limit as string) : 10,
+    });
+
+    res.status(200).json(result);
   } catch (error: any) {
     res.status(400).json({
-      error: "Category retrive failed",
+      error: "Category retrieval failed",
       details: error.message,
     });
   }
 };
-
 // delete category
 const editCategory = async (req: Request, res: Response) => {
   try {
@@ -47,6 +52,8 @@ const editCategory = async (req: Request, res: Response) => {
 const deleteCategory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    
+    // console.log("categoryId:", id);
     const result = await categoryService.deleteCategory(id as string);
     res.status(200).json({
       result,
