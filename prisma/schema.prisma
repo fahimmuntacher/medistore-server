@@ -14,10 +14,11 @@ datasource db {
 }
 
 model User {
-  id    String  @id @default(uuid())
-  email String  @unique
-  name  String?
-  role  Role    @default(CUSTOMER)
+  id       String  @id @default(uuid())
+  email    String  @unique
+  name     String?
+  role     Role    @default(CUSTOMER)
+  isBanned Boolean @default(false)
 
   medicines Medicine[]
   orders    Order[]

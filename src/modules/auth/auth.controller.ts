@@ -37,6 +37,51 @@ const getAllUser = async (req: Request, res: Response) => {
   }
 };
 
+
+
+
+const getSingleUser = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const result = await AuthServices.getSingleUser(id as string);
+      res.status(200).json({
+        success: true,
+        message: "User retrieved successfully",
+        data: result,
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        error: "User retrieval failed",
+        details: error.message,
+      });
+    }
+}
+
+
+const editSingleUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+
+    const result = await AuthServices.editUser(id as string, data);
+
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      error: "User update failed",
+      details: error.message,
+    });
+  }
+};
+
 export const AuthController = {
   getAllUser,
+  editSingleUser,
+  getSingleUser
 };

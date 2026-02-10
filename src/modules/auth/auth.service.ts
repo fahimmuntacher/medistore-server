@@ -60,6 +60,7 @@ const getAllUser = async ({
       image: true,
       createdAt: true,
       emailVerified: true,
+      isBanned: true,
     },
   });
 
@@ -80,6 +81,77 @@ const getAllUser = async ({
   };
 };
 
+const getSingleUser = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      image: true,
+      createdAt: true,
+    },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  let extraInfo: Record<string, number> = {};
+
+  /* 👤 Customer → total orders */
+  if (user.role === Role.CUSTOMER) {
+    const totalOrders = await prisma.order.count({
+      where: {
+        customerId: user.id,
+      },
+    });
+
+    const totalReviews = await prisma.review.count({
+        where: {
+            customerId: user.id
+        }
+    })
+
+    extraInfo.totalOrders = totalOrders;
+    extraInfo.totalReviews = totalReviews;
+  }
+
+  /* 🏪 Seller → total active medicines */
+  if (user.role === Role.SELLER) {
+    const totalActiveMedicines = await prisma.medicine.count({
+      where: {
+        sellerId: user.id,
+      },
+
+    });
+    
+
+    extraInfo.totalActiveMedicines = totalActiveMedicines;
+  }
+
+  return {
+    ...user,
+    ...extraInfo,
+  };
+};
+
+const editUser = async (
+  userId: string,
+  data: Partial<Prisma.UserUpdateInput>,
+) => {
+  const result = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data,
+  });
+  return result;
+};
+
 export const AuthServices = {
   getAllUser,
+  editUser,
+  getSingleUser,
 };
