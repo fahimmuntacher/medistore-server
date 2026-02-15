@@ -71,7 +71,7 @@ export type GetAllReviewOptions = {
   limit?: number;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
-  rating?: number | undefined; // optional filter by rating
+  rating?: number | undefined; 
 };
 
 const getAllReview = async (options: GetAllReviewOptions = {}) => {

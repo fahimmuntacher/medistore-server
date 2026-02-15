@@ -132,10 +132,14 @@ const getAllOrders = async ({
               name: true,
               manufacturer: true,
               sellerId: true,
+              
             },
+          
           },
         },
+
       },
+      reviews : true
     },
     orderBy: {
       [sortBy]: sortOrder,
@@ -177,8 +181,11 @@ const getSingleOrder = async (id: string) => {
               id: true,
               name: true,
               manufacturer: true,
+              reviews : true
             },
           },
+          
+          
         },
       },
     },

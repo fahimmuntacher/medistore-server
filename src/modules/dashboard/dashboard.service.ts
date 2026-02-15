@@ -14,6 +14,9 @@ const adminOverview = async () => {
     prisma.medicine.count(),
     prisma.order.count(),
     prisma.order.aggregate({
+      where: {
+        status: "DELIVERED",
+      },
       _sum: { totalAmount: true },
     }),
     prisma.order.findMany({
@@ -82,7 +85,7 @@ const customerOverview = async (customerId: string) => {
   const [totalOrders, spent, recentOrders] = await Promise.all([
     prisma.order.count({ where: { customerId } }),
     prisma.order.aggregate({
-      where: { customerId },
+      where: { customerId, status: "DELIVERED" },
       _sum: { totalAmount: true },
     }),
     prisma.order.findMany({

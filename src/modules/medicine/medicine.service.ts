@@ -145,6 +145,7 @@ const getSingleMedine = async (id: string) => {
           image: true,
         },
       },
+      reviews : true
     },
   });
   return result;
