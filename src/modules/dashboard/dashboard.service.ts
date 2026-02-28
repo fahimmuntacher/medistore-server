@@ -48,6 +48,9 @@ export const sellerOverview = async (sellerId: string) => {
       medicine: {
         sellerId,
       },
+      order: {
+        status: "DELIVERED",
+      },
     },
     include: {
       order: true,

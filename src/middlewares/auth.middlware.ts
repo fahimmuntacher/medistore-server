@@ -20,13 +20,60 @@ declare global {
   }
 }
 
-export const authMiddleWare = (...roles: Role[]) => {
+// export const authMiddleWare = (...roles: Role[]) => {
+//   return async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const session = await auth.api.getSession({
+//         headers: req.headers as any,
+//       });
+
+//       console.log(session);
+
+//       if (!session) {
+//         return res.status(401).json({
+//           success: false,
+//           message: "You are not authorized!",
+//         });
+//       }
+
+//       // if (!session.user.emailVerified) {
+//       //   return res.status(403).json({
+//       //     success: false,
+//       //     message: "Email verification required. Please verfiy your email!",
+//       //   });
+//       // }
+
+//       req.user = {
+//         id: session?.user.id,
+//         email: session.user.email,
+//         role: session.user.role as string,
+//         emailVerified: session.user.emailVerified,
+//       };
+
+//       if (roles.length && !roles.includes(req.user.role as Role)) {
+//         return res.status(403).json({
+//           success: false,
+//           message:
+//             "Forbidden! You don't have permission to access this resources!",
+//         });
+//       }
+
+//       next();
+//     } catch (error) {
+//       next(error);
+//     }
+//   };
+// };
+
+const authMiddleWare = (...roles: Role[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // get user session
       const session = await auth.api.getSession({
         headers: req.headers as any,
       });
-      // console.log(session);
+
+      console.log("session", session);
 
       if (!session) {
         return res.status(401).json({
@@ -35,15 +82,15 @@ export const authMiddleWare = (...roles: Role[]) => {
         });
       }
 
-      if (!session.user.emailVerified) {
-        return res.status(403).json({
-          success: false,
-          message: "Email verification required. Please verfiy your email!",
-        });
-      }
+      // if (!session.user.emailVerified) {
+      //   return res.status(403).json({
+      //     success: false,
+      //     message: "Email verification required. Please verfiy your email!",
+      //   });
+      // }
 
       req.user = {
-        id: session.user.id,
+        id: session?.user.id,
         email: session.user.email,
         role: session.user.role as string,
         emailVerified: session.user.emailVerified,
@@ -58,8 +105,10 @@ export const authMiddleWare = (...roles: Role[]) => {
       }
 
       next();
-    } catch (error) {
-      next(error);
+    } catch (err) {
+      next(err);
     }
   };
 };
+
+export default authMiddleWare;

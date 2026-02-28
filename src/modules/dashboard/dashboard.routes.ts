@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { dashboardController } from "./dashboard.controller";
-import { authMiddleWare, Role } from "../../middlewares/auth.middlware";
+import authMiddleWare, {  Role } from "../../middlewares/auth.middlware";
 
 const router = Router();
 
@@ -16,7 +16,7 @@ router.get(
 );
 router.get(
   "/customer",
-  
+  authMiddleWare(Role.CUSTOMER),
   dashboardController.customerOverview,
 );
 

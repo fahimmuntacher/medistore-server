@@ -1,6 +1,6 @@
 import express from "express";
 import { getSettings, upsertSettings } from "./settings.controller";
-import { authMiddleWare, Role } from "../../middlewares/auth.middlware";
+import authMiddleWare, {  Role } from "../../middlewares/auth.middlware";
 
 const router = express.Router();
 

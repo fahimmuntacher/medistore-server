@@ -32,7 +32,8 @@ const sellerOverview = async (req: Request, res: Response) => {
 const customerOverview = async (req: Request, res: Response) => {
   try {
     const customerId = req.user?.id;
-
+    console.log(req.user);
+    console.log("customer id" ,customerId);
     const result = await dashboardService.customerOverview(customerId as string);
     res.status(200).json(result);
   } catch (error: any) {
