@@ -44,6 +44,11 @@ export const auth = betterAuth({
       enabled: true,
       maxAge: 5 * 60, // 5 minutes
     },
+    cookieOptions: {
+      secure: true, // HTTPS only
+      sameSite: "none", // allow cross‑site requests from your front end
+      // domain: ".vercel.app", // only if you need sub‑domain sharing
+    },
   },
 
   advanced: {
